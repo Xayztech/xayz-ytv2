@@ -17,7 +17,7 @@ router.get('/', (req, res) => res.redirect('/xayz/home'));
 router.get('/xayz/search', (req, res) => res.sendFile(page('search')));
 
 // ─── Search + Download ───────────────────────────────────────────────────────
-router.get('/xayz/search+download', (req, res) => res.sendFile(page('search-download')));
+router.get('/xayz/search-download', (req, res) => res.sendFile(page('search-download')));
 
 // ─── Docs ─────────────────────────────────────────────────────────────────────
 router.get('/xayz/yt/docs', (req, res) => res.sendFile(page('docs')));
