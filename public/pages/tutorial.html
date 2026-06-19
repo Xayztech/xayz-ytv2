@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAYZ YT — Tutorial</title>
+<link rel="stylesheet" href="/assets/css/global.css">
+<style>
+.tut-hero { padding: 80px 0 48px; text-align: center; }
+.steps { display: flex; flex-direction: column; gap: 28px; max-width: 800px; margin: 0 auto; }
+.step-item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 20px;
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: var(--transition);
+}
+.step-item:hover { border-color: var(--border2); }
+.step-num {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+.step-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+.step-desc { color: var(--text2); font-size: 0.88rem; line-height: 1.7; margin-bottom: 14px; }
+.faq-wrap { max-width: 800px; margin: 0 auto 60px; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  padding: 18px 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.faq-q::after { content: '+'; font-size: 1.2rem; color: var(--accent); transition: var(--transition); }
+.faq-item.open .faq-q::after { content: '−'; }
+.faq-a { display: none; color: var(--text2); font-size: 0.88rem; line-height: 1.7; padding-bottom: 16px; }
+.faq-item.open .faq-a { display: block; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="/xayz/home" class="topbar-logo">XAYZ <span>YT</span></a>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-label">Navigation</div>
+  <div class="drawer-nav">
+    <a href="/xayz/home"><span class="icon">🏠</span> Home</a>
+    <a href="/xayz/search"><span class="icon">🔍</span> Search</a>
+    <a href="/xayz/search+download"><span class="icon">⚡</span> Search + Download</a>
+  </div>
+  <div class="drawer-label">API</div>
+  <div class="drawer-nav">
+    <a href="/xayz/yt/docs"><span class="icon">📚</span> Docs</a>
+    <a href="/xayz/yt/tutorial"><span class="icon">🎓</span> Tutorial</a>
+    <a href="/xayz/yt/apikey"><span class="icon">🔑</span> Get API Key</a>
+    <a href="/xayz/yt/cek-apikey"><span class="icon">✅</span> Cek API Key</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="container">
+    <div class="tut-hero">
+      <div style="display:inline-flex;gap:8px;margin-bottom:16px;">
+        <span class="chip chip-accent">🎓 TUTORIAL</span>
+      </div>
+      <h1 class="section-title">Tutorial Lengkap</h1>
+      <p class="section-sub">Panduan step-by-step cara menggunakan XAYZ YT API Platform</p>
+    </div>
+
+    <div class="steps">
+      <div class="step-item fade-up" style="animation-delay:0.05s">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Dapatkan API Key</div>
+          <div class="step-desc">Kunjungi halaman <a href="/xayz/yt/apikey" style="color:var(--accent);">API Key</a>, masukkan nama kamu (opsional), lalu klik tombol "Generate API Key Gratis!". API key akan muncul — simpan key tersebut karena tidak bisa dipulihkan jika hilang.</div>
+          <a href="/xayz/yt/apikey" class="btn btn-primary btn-sm">🔑 Generate Key</a>
+        </div>
+      </div>
+
+      <div class="step-item fade-up" style="animation-delay:0.1s">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Test API di Browser</div>
+          <div class="step-desc">Buka URL berikut di browser (ganti KEY dengan API key kamu):</div>
+          <div class="code-block" style="font-size:0.78rem;">https://youtubeonline-dl.vercel.app/xayz/yt-machine/api/search?q=test&apikey=XAYZ-XXXX-XXXX-XXXX</div>
+          <p style="color:var(--text2);font-size:0.82rem;margin-top:10px;">Jika berhasil, kamu akan melihat response JSON dengan daftar video.</p>
+        </div>
+      </div>
+
+      <div class="step-item fade-up" style="animation-delay:0.15s">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Download MP3 / MP4</div>
+          <div class="step-desc">Gunakan endpoint ytmp3 atau ytmp4 dengan URL video YouTube dan pilih kualitas yang diinginkan:</div>
+          <div class="code-block" style="font-size:0.78rem;"># MP3 320kbps
+/xayz/yt-machine/api/ytmp3?url=YT_URL&quality=320&apikey=KEY
+
+# MP4 1080p
+/xayz/yt-machine/api/ytmp4?url=YT_URL&quality=1080&apikey=KEY</div>
+        </div>
+      </div>
+
+      <div class="step-item fade-up" style="animation-delay:0.2s">
+        <div class="step-num">04</div>
+        <div>
+          <div class="step-title">Integrasikan ke Kode Kamu</div>
+          <div class="step-desc">API ini mendukung Node.js, Python, PHP, JavaScript, Bash, dan bahasa apapun yang bisa melakukan HTTP request. Lihat <a href="/xayz/yt/docs#nodejs" style="color:var(--accent);">contoh kode lengkap di halaman Docs</a>.</div>
+          <div class="code-block" style="font-size:0.78rem;">// Node.js CJS - Install package langsung
+npm install xayz-yt
+
+const { ytmp3 } = require('xayz-yt');
+const result = await ytmp3('https://youtu.be/dQw4w9WgXcQ', 320);
+console.log(result.download.url);</div>
+        </div>
+      </div>
+
+      <div class="step-item fade-up" style="animation-delay:0.3s">
+        <div class="step-num">06</div>
+        <div>
+          <div class="step-title">Pantau Penggunaan</div>
+          <div class="step-desc">Kunjungi halaman <a href="/xayz/yt/cek-apikey" style="color:var(--accent);">Cek API Key</a> untuk melihat statistik penggunaan: total request, IP yang mengakses, domain, user-agent, dan riwayat request terbaru.</div>
+          <a href="/xayz/yt/cek-apikey" class="btn btn-ghost btn-sm">📊 Cek Penggunaan</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="glow-line"></div>
+
+    <h2 class="section-title" style="font-size:1.3rem;margin-bottom:24px;max-width:800px;margin-left:auto;margin-right:auto;">❓ FAQ</h2>
+    <div class="faq-wrap">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Apakah API ini benar-benar gratis?</button>
+        <div class="faq-a">Ya! 100% gratis selamanya. Tidak ada biaya tersembunyi, tidak ada batas request, tidak perlu kartu kredit.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Kualitas apa saja yang didukung?</button>
+        <div class="faq-a">Audio (MP3): 92kbps, 128kbps, 256kbps, 320kbps. Video (MP4): 144p, 360p, 480p, 720p, 1080p.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Apakah bisa digunakan untuk AI / chatbot?</button>
+        <div class="faq-a">Ya! API ini mendukung sandbox environment, headless request, dan bisa diakses dari AI agents seperti GPT, Claude, atau framework AI apapun melalui HTTP request standar.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Apakah Ada Iklannya saat membuka website ataupun lain-lainnya?</button>
+        <div class="faq-a">Tidak Ada! Karena Ini gratis, dan friendly untuk pengguna gratis.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Apakah source code bisa diproteksi?</button>
+        <div class="faq-a">Ya! Platform sudah memiliki perlindungan untuk mencegah akses langsung ke file source code, memblokir scraper bot, dan menggunakan path yang berbeda antara API endpoint dan file aktual.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Apakah sudah ada versi NPM-nya?</button>
+        <div class="faq-a">Belum! Dan masih belum dibuatkan ataupun tidak sama sekali demi keamanan.</div>
+      </div>
+    </div>
+
+    <div id="json-wrap"></div>
+  </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script>
+function toggleFaq(btn) {
+  btn.parentElement.classList.toggle('open');
+}
+</script>
+</body>
+</html>

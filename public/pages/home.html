@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAYZ YT Platform — Home</title>
+<link rel="stylesheet" href="/assets/css/global.css">
+<style>
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px 60px;
+  position: relative;
+}
+canvas#particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-badge {
+  margin-bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.2rem, 8vw, 4.8rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+.hero-title .line1 {
+  background: linear-gradient(135deg, #fff 30%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-title .line2 {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  font-size: 0.55em;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+.hero-desc {
+  color: var(--text2);
+  font-size: 1.05rem;
+  max-width: 540px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+}
+
+/* Download box */
+.dl-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 0 60px rgba(99,102,241,0.08), 0 0 0 1px rgba(99,102,241,0.06);
+  position: relative;
+  z-index: 2;
+}
+
+.dl-box::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 21px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.2), transparent 50%, rgba(245,158,11,0.15));
+  z-index: -1;
+  pointer-events: none;
+}
+
+.url-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.url-row .input { flex: 1; font-size: 0.9rem; }
+
+/* Result area */
+#result-area { margin-top: 24px; display: none; }
+
+/* Custom Video Player */
+.v-player-wrap {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  position: relative;
+}
+.v-player-wrap video {
+  width: 100%;
+  display: block;
+  max-height: 300px;
+  object-fit: contain;
+}
+.v-player-wrap audio { width: 100%; }
+
+.player-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.player-info { text-align: left; margin-bottom: 16px; }
+.player-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.player-meta { color: var(--text2); font-size: 0.8rem; }
+
+/* Custom Controls */
+.ctrl-bar {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.ctrl-progress {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--surface);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: height 0.15s;
+}
+.ctrl-progress:hover { height: 6px; }
+.ctrl-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--glow);
+  cursor: pointer;
+}
+.ctrl-time { font-size: 0.75rem; color: var(--text2); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+.ctrl-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ctrl-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Space Grotesk', sans-serif;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(99,102,241,0.08); }
+.ctrl-btn.play-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-weight: 600;
+}
+.ctrl-btn.active { border-color: var(--accent); color: #a5b4fc; background: rgba(99,102,241,0.12); }
+.vol-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.vol-slider {
+  width: 70px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--accent2);
+  cursor: pointer;
+}
+
+/* Format toggle */
+.fmt-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.fmt-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  transition: var(--transition);
+}
+.fmt-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: #fff;
+}
+
+/* Quality select */
+.qual-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.qual-chip {
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  transition: var(--transition);
+}
+.qual-chip.active {
+  background: rgba(245,158,11,0.12);
+  border-color: rgba(245,158,11,0.4);
+  color: var(--gold2);
+}
+.qual-chip:hover { border-color: var(--accent); }
+
+/* Loading overlay */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px;
+}
+.loading-dots {
+  display: flex;
+  gap: 6px;
+}
+.loading-dots span {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; background: var(--gold); }
+@keyframes dotPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1.1); opacity: 1; }
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 48px;
+  max-width: 640px;
+  width: 100%;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-label { font-size: 0.72rem; color: var(--text3); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="/xayz/home" class="topbar-logo">XAYZ <span>YT</span></a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+
+<!-- SIDE DRAWER -->
+<nav class="drawer" id="drawer">
+  <div class="drawer-label">Navigation</div>
+  <div class="drawer-nav">
+    <a href="/xayz/home"><span class="icon">🏠</span> Home</a>
+    <a href="/xayz/search"><span class="icon">🔍</span> Search</a>
+    <a href="/xayz/search+download"><span class="icon">⚡</span> Search + Download</a>
+  </div>
+  <div class="drawer-label">API</div>
+  <div class="drawer-nav">
+    <a href="/xayz/yt/docs"><span class="icon">📚</span> Docs <span class="badge">NEW</span></a>
+    <a href="/xayz/yt/tutorial"><span class="icon">🎓</span> Tutorial</a>
+    <a href="/xayz/yt/apikey"><span class="icon">🔑</span> Get API Key <span class="badge">FREE</span></a>
+    <a href="/xayz/yt/cek-apikey"><span class="icon">✅</span> Cek API Key</a>
+  </div>
+  <div class="drawer-label" style="margin-top:auto;">Info</div>
+  <div class="drawer-nav">
+    <a href="/xayz/yt-machine/api" target="_blank"><span class="icon">🌐</span> Raw API</a>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page-wrap">
+  <section class="hero">
+    <canvas id="particles"></canvas>
+
+    <div class="hero-badge">
+      <span class="chip chip-gold">✦ PREMIUM</span>
+      <span class="chip chip-accent">FREE LIFETIME</span>
+      <span class="chip chip-green">UNLIMITED</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span class="line1">XAYZ YT PLATFORM</span>
+      <span class="line2">YOUTUBE API & DOWNLOADER</span>
+    </h1>
+
+    <p class="hero-desc">
+      Platform untuk download & stream YouTube. API siap pakai, gratis selamanya, unlimited request, semua format didukung.
+    </p>
+
+    <!-- Main Download Box -->
+    <div class="dl-box">
+      <div class="url-row">
+        <input type="text" class="input" id="yt-url" placeholder="🔗 Paste YouTube URL di sini..." />
+        <button class="btn btn-primary" id="btn-download" onclick="startDownload()">
+          ⬇ Download
+        </button>
+      </div>
+
+      <!-- Result Area -->
+      <div id="result-area">
+        <!-- Loading -->
+        <div id="loading-state" class="loading-overlay" style="display:none;">
+          <div class="loading-dots"><span></span><span></span><span></span></div>
+          <p style="color:var(--text2);font-size:0.88rem;" id="loading-msg">Mengambil data video...</p>
+        </div>
+
+        <!-- Player & Controls -->
+        <div id="player-state" style="display:none;">
+          <img id="v-thumb" class="player-thumb" src="" alt="thumbnail">
+          <div class="player-info">
+            <div class="player-title" id="v-title">—</div>
+            <div class="player-meta" id="v-meta">—</div>
+          </div>
+
+          <!-- Custom Media Controls -->
+          <div class="ctrl-bar" id="ctrl-bar">
+            <input type="range" class="ctrl-progress" id="ctrl-progress" value="0" min="0" max="100" step="0.1">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="ctrl-time" id="ctrl-time">0:00 / 0:00</span>
+            </div>
+            <div class="ctrl-btns">
+              <button class="ctrl-btn" onclick="mediaSkip(-10)" title="Rewind 10s">⟪ 10</button>
+              <button class="ctrl-btn" onclick="mediaSkip(-5)" title="Rewind 5s">⟪ 5</button>
+              <button class="ctrl-btn play-btn" id="play-btn" onclick="togglePlay()">▶ Play</button>
+              <button class="ctrl-btn" onclick="mediaSkip(5)" title="Forward 5s">5 ⟫</button>
+              <button class="ctrl-btn" onclick="mediaSkip(10)" title="Forward 10s">10 ⟫</button>
+              <div class="vol-wrap">
+                🔊 <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.02" value="1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Format & Quality -->
+          <div class="fmt-row">
+            <button class="fmt-btn active" id="fmt-mp4" onclick="setFmt('mp4')">📹 MP4 (Video)</button>
+            <button class="fmt-btn" id="fmt-mp3" onclick="setFmt('mp3')">🎵 MP3 (Audio)</button>
+          </div>
+
+          <div class="qual-row" id="qual-row"></div>
+
+          <a class="btn btn-gold btn-lg" id="btn-dl-now" href="#" style="width:100%;justify-content:center;" onclick="doDownload(event)">
+            ⬇ Download Now!
+          </a>
+
+          <div id="vonline-wrap" style="margin-top:10px;display:none;">
+            <div class="glow-line"></div>
+            <video id="vonline" controls style="width:100%;border-radius:10px;background:#000;"></video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">∞</div><div class="stat-label">Unlimited API</div></div>
+      <div class="stat-card"><div class="stat-num">5</div><div class="stat-label">Kualitas Tersedia</div></div>
+      <div class="stat-card"><div class="stat-num">FREE</div><div class="stat-label">Forever & Ever</div></div>
+    </div>
+  </section>
+
+  <div id="json-wrap" class="container" style="padding-bottom:60px;"></div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script>
+initParticles('particles');
+
+const audioQual = [92, 128, 256, 320];
+const videoQual = [144, 360, 480, 720, 1080];
+let currentFmt = 'mp4';
+let currentQual = 360;
+let videoData = null;
+let mediaEl = null;
+
+function setFmt(fmt) {
+  currentFmt = fmt;
+  document.getElementById('fmt-mp4').classList.toggle('active', fmt === 'mp4');
+  document.getElementById('fmt-mp3').classList.toggle('active', fmt === 'mp3');
+  renderQualChips();
+  loadMedia();
+}
+
+function renderQualChips() {
+  const arr = currentFmt === 'mp3' ? audioQual : videoQual;
+  const def = currentFmt === 'mp3' ? 128 : 360;
+  currentQual = def;
+  const row = document.getElementById('qual-row');
+  row.innerHTML = arr.map(q => {
+    const label = currentFmt === 'mp3' ? `${q} kbps` : `${q}p`;
+    return `<button class="qual-chip${q === def ? ' active' : ''}" onclick="selectQual(${q}, this)">${label}</button>`;
+  }).join('');
+}
+
+function selectQual(q, el) {
+  currentQual = q;
+  document.querySelectorAll('.qual-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function startDownload() {
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) { toast('Masukkan URL YouTube terlebih dahulu!', 'error'); return; }
+
+  document.getElementById('result-area').style.display = 'block';
+  document.getElementById('loading-state').style.display = 'flex';
+  document.getElementById('player-state').style.display = 'none';
+
+  try {
+    setMsg('Mengambil metadata video...');
+    const data = await apiCall('metadata', { url });
+
+    if (!data.status) throw new Error(data.message);
+    videoData = data;
+
+    setMsg('Memuat player...');
+    document.getElementById('v-title').textContent = data.title;
+    const thumb = data.thumbnails?.find(t => t.quality === 'high') || data.thumbnails?.[0];
+    if (thumb) document.getElementById('v-thumb').src = thumb.url;
+    document.getElementById('v-meta').textContent = `${data.channel_title || '—'} • ${Number(data.statistics?.view || 0).toLocaleString('id')} penonton • 👍 ${Number(data.statistics?.like || 0).toLocaleString('id')}`;
+
+    renderQualChips();
+
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('player-state').style.display = 'block';
+    loadMedia();
+
+    renderJsonBox(document.getElementById('json-wrap'), data);
+  } catch (err) {
+    document.getElementById('loading-state').style.display = 'none';
+    toast('Error: ' + err.message, 'error');
+  }
+}
+
+function setMsg(m) { document.getElementById('loading-msg').textContent = m; }
+
+async function loadMedia() {
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) return;
+  const vonline = document.getElementById('vonline');
+  const wrap = document.getElementById('vonline-wrap');
+  wrap.style.display = 'none';
+  vonline.src = '';
+
+  try {
+    const data = await apiCall('stream', { url, type: currentFmt, quality: currentQual });
+    if (data.status && data.stream_url) {
+      vonline.src = data.stream_url;
+      wrap.style.display = 'block';
+      mediaEl = vonline;
+      setupMediaControls();
+      document.getElementById('ctrl-bar').style.display = '';
+    }
+  } catch (e) { console.log('Stream not available:', e); }
+}
+
+function setupMediaControls() {
+  if (!mediaEl) return;
+  const prog = document.getElementById('ctrl-progress');
+  const time = document.getElementById('ctrl-time');
+
+  mediaEl.ontimeupdate = () => {
+    if (!mediaEl.duration) return;
+    prog.value = (mediaEl.currentTime / mediaEl.duration) * 100;
+    time.textContent = `${fmt(mediaEl.currentTime)} / ${fmt(mediaEl.duration)}`;
+  };
+  prog.oninput = () => {
+    if (!mediaEl.duration) return;
+    mediaEl.currentTime = (prog.value / 100) * mediaEl.duration;
+  };
+  const vol = document.getElementById('vol-slider');
+  vol.oninput = () => { mediaEl.volume = vol.value; };
+}
+
+function togglePlay() {
+  if (!mediaEl) return;
+  const btn = document.getElementById('play-btn');
+  if (mediaEl.paused) { mediaEl.play(); btn.textContent = '⏸ Pause'; }
+  else { mediaEl.pause(); btn.textContent = '▶ Play'; }
+}
+
+function mediaSkip(s) { if (mediaEl) mediaEl.currentTime = Math.max(0, mediaEl.currentTime + s); }
+
+function fmt(s) {
+  s = Math.floor(s || 0);
+  const m = Math.floor(s / 60), sec = s % 60;
+  return `${m}:${String(sec).padStart(2,'0')}`;
+}
+
+function doDownload(e) {
+  e.preventDefault();
+  const url = document.getElementById('yt-url').value.trim();
+  if (!url) return;
+  const dlUrl = `/xayz-yt/sys/cdn-download/${currentFmt}/${currentQual}?url=${encodeURIComponent(url)}`;
+  window.location.href = dlUrl;
+}
+
+// Allow pressing Enter
+document.getElementById('yt-url').addEventListener('keydown', e => { if (e.key === 'Enter') startDownload(); });
+</script>
+</body>
+</html>

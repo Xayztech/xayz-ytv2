@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAYZ YT — Search</title>
+<link rel="stylesheet" href="/assets/css/global.css">
+<style>
+.search-hero {
+  padding: 80px 0 40px;
+  text-align: center;
+}
+.search-row {
+  display: flex;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 auto 40px;
+}
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: var(--transition);
+  animation: fadeUp 0.45s ease both;
+}
+.result-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.12);
+}
+.result-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: var(--surface2);
+  position: relative;
+}
+.result-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.result-duration {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.result-body { padding: 14px; }
+.result-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+.result-channel {
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.result-desc {
+  font-size: 0.75rem;
+  color: var(--text3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.result-stats {
+  display: flex;
+  gap: 10px;
+  font-size: 0.7rem;
+  color: var(--text3);
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.result-stats span { display: flex; align-items: center; gap: 3px; }
+.result-actions { display: flex; gap: 8px; }
+.result-actions .btn { flex: 1; font-size: 0.78rem; padding: 8px 12px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="/xayz/home" class="topbar-logo">XAYZ <span>YT</span></a>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-label">Navigation</div>
+  <div class="drawer-nav">
+    <a href="/xayz/home"><span class="icon">🏠</span> Home</a>
+    <a href="/xayz/search"><span class="icon">🔍</span> Search</a>
+    <a href="/xayz/search+download"><span class="icon">⚡</span> Search + Download</a>
+  </div>
+  <div class="drawer-label">API</div>
+  <div class="drawer-nav">
+    <a href="/xayz/yt/docs"><span class="icon">📚</span> Docs</a>
+    <a href="/xayz/yt/tutorial"><span class="icon">🎓</span> Tutorial</a>
+    <a href="/xayz/yt/apikey"><span class="icon">🔑</span> Get API Key</a>
+    <a href="/xayz/yt/cek-apikey"><span class="icon">✅</span> Cek API Key</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="container">
+    <div class="search-hero">
+      <div class="hero-badge" style="display:inline-flex;gap:8px;margin-bottom:16px;">
+        <span class="chip chip-accent">🔍 SEARCH</span>
+      </div>
+      <h1 class="section-title">Cari Video YouTube</h1>
+      <p class="section-sub">Masukkan kata kunci dan temukan video YouTube dengan lengkap</p>
+
+      <div class="search-row">
+        <input type="text" class="input" id="q-input" placeholder="Masukkan kata kunci..." />
+        <button class="btn btn-primary" onclick="doSearch()">🔍 Search</button>
+      </div>
+    </div>
+
+    <div id="loading-box" class="loading-box" style="display:none;">
+      <div class="spin"></div>
+      <p>Mencari video...</p>
+    </div>
+
+    <div id="results-grid" class="results-grid"></div>
+
+    <div class="glow-line"></div>
+    <div id="json-wrap"></div>
+  </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script>
+document.getElementById('q-input').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+async function doSearch() {
+  const q = document.getElementById('q-input').value.trim();
+  if (!q) { toast('Masukkan kata kunci!', 'error'); return; }
+
+  document.getElementById('loading-box').style.display = 'flex';
+  document.getElementById('results-grid').innerHTML = '';
+  document.getElementById('json-wrap').innerHTML = '';
+
+  try {
+    const data = await apiCall('search', { q });
+    document.getElementById('loading-box').style.display = 'none';
+    if (!data.status) throw new Error(data.message);
+
+    const grid = document.getElementById('results-grid');
+    (data.results || []).slice(0, 30).forEach((v, i) => {
+      if (!v.videoId) return;
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.style.animationDelay = (i * 0.04) + 's';
+      card.innerHTML = `
+        <div class="result-thumb" style="position:relative;">
+          <img src="${v.thumbnail || ''}" alt="thumb" loading="lazy" onerror="this.src='/assets/css/no-thumb.png'">
+          <span class="result-duration">${v.timestamp || '—'}</span>
+        </div>
+        <div class="result-body">
+          <div class="result-title">${escapeHtml(v.title || '—')}</div>
+          <div class="result-channel">📺 ${escapeHtml(v.author?.name || '—')}</div>
+          <div class="result-desc">${escapeHtml(v.description || '—')}</div>
+          <div class="result-stats">
+            <span>👁 ${Number(v.views || 0).toLocaleString('id')}</span>
+            <span>⏱ ${v.timestamp || '—'}</span>
+            ${v.ago ? `<span>📅 ${v.ago}</span>` : ''}
+          </div>
+          <div class="result-actions">
+            <button class="btn btn-ghost" onclick="copyText('https://youtu.be/${v.videoId}', 'Link Disalin!')">📋 Copy Link</button>
+            <a href="https://youtu.be/${v.videoId}" target="_blank" class="btn btn-ghost">▶ Buka</a>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+
+    if (!data.results?.length) grid.innerHTML = '<p style="color:var(--text2);text-align:center;padding:40px;">Tidak ada hasil ditemukan.</p>';
+
+    renderJsonBox(document.getElementById('json-wrap'), data);
+  } catch(err) {
+    document.getElementById('loading-box').style.display = 'none';
+    toast('Error: ' + err.message, 'error');
+  }
+}
+</script>
+</body>
+</html>

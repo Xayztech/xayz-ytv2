@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAYZ YT — Cek API Key</title>
+<link rel="stylesheet" href="/assets/css/global.css">
+<style>
+.page-hero { padding: 80px 0 40px; text-align: center; }
+.check-box {
+  max-width: 580px;
+  margin: 0 auto 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 14px; margin-bottom: 28px; }
+.stat-c {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-n { font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:900; color:var(--gold); }
+.stat-l { font-size:0.7rem; color:var(--text3); margin-top:4px; }
+.table-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a href="/xayz/home" class="topbar-logo">XAYZ <span>YT</span></a>
+  <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</header>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-label">Navigation</div>
+  <div class="drawer-nav">
+    <a href="/xayz/home"><span class="icon">🏠</span> Home</a>
+    <a href="/xayz/search"><span class="icon">🔍</span> Search</a>
+    <a href="/xayz/search+download"><span class="icon">⚡</span> Search + Download</a>
+  </div>
+  <div class="drawer-label">API</div>
+  <div class="drawer-nav">
+    <a href="/xayz/yt/docs"><span class="icon">📚</span> Docs</a>
+    <a href="/xayz/yt/tutorial"><span class="icon">🎓</span> Tutorial</a>
+    <a href="/xayz/yt/apikey"><span class="icon">🔑</span> Get API Key</a>
+    <a href="/xayz/yt/cek-apikey"><span class="icon">✅</span> Cek API Key</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="container">
+    <div class="page-hero">
+      <div style="display:inline-flex;gap:8px;margin-bottom:16px;">
+        <span class="chip chip-accent">✅ CEK API KEY</span>
+      </div>
+      <h1 class="section-title">Cek Status API Key</h1>
+      <p class="section-sub">Pantau penggunaan, IP, User-Agent, Domain, dan riwayat request</p>
+    </div>
+
+    <div class="check-box">
+      <label style="font-size:0.85rem;color:var(--text2);display:block;margin-bottom:8px;">Masukkan API Key</label>
+      <input type="text" class="input" id="key-input" placeholder="XAYZ-XXXX-XXXX-XXXX" style="margin-bottom:14px;font-family:'JetBrains Mono',monospace;">
+      <button class="btn btn-primary" onclick="checkKey()" style="width:100%;">🔍 Check API Key</button>
+    </div>
+
+    <div id="result-wrap" style="display:none;">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="table-wrap" id="log-table-wrap"></div>
+    </div>
+
+    <div class="glow-line"></div>
+    <div id="json-wrap"></div>
+  </div>
+</div>
+
+<script src="/assets/js/global.js"></script>
+<script>
+async function checkKey() {
+  const key = document.getElementById('key-input').value.trim();
+  if (!key) { toast('Masukkan API key!', 'error'); return; }
+
+  try {
+    const res = await fetch(`/xayz/yt/cek-apikey/check?key=${encodeURIComponent(key)}`);
+    const data = await res.json();
+    if (!data.status) throw new Error(data.message);
+
+    const d = data.data;
+    document.getElementById('result-wrap').style.display = 'block';
+
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-c"><div class="stat-n">${d.totalRequests.toLocaleString('id')}</div><div class="stat-l">Total Request</div></div>
+      <div class="stat-c"><div class="stat-n">${d.uniqueIPs}</div><div class="stat-l">Unique IP</div></div>
+      <div class="stat-c"><div class="stat-n">${d.uniqueDomains}</div><div class="stat-l">Unique Domain</div></div>
+      <div class="stat-c"><div class="stat-n" style="font-size:0.9rem;color:var(--green);">${d.status.toUpperCase()}</div><div class="stat-l">Status</div></div>
+      <div class="stat-c"><div class="stat-n" style="font-size:0.75rem;color:var(--gold);">${d.plan}</div><div class="stat-l">Plan</div></div>
+      <div class="stat-c"><div class="stat-n" style="font-size:0.65rem;color:var(--cyan);">${d.unlimited ? '∞' : 'LIMITED'}</div><div class="stat-l">Kuota</div></div>
+    `;
+
+    const rows = (d.logs || []).map((l, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td><code style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;">${escapeHtml(l.ip)}</code></td>
+        <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(l.ua)}</td>
+        <td><code style="font-size:0.75rem;">${escapeHtml(l.domain)}</code></td>
+        <td><code style="font-size:0.75rem;">${escapeHtml(l.endpoint)}</code></td>
+        <td><span class="chip chip-accent" style="font-size:0.6rem;">${l.method}</span></td>
+        <td style="font-size:0.72rem;white-space:nowrap;">${new Date(l.timestamp).toLocaleString('id-ID')}</td>
+      </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px;">Belum ada request</td></tr>';
+
+    document.getElementById('log-table-wrap').innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>No</th><th>IP</th><th>User-Agent</th><th>Domain</th><th>Endpoint</th><th>Method</th><th>Waktu</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    renderJsonBox(document.getElementById('json-wrap'), data);
+    toast('API Key valid!', 'success');
+  } catch(err) {
+    toast('Error: ' + err.message, 'error');
+    document.getElementById('result-wrap').style.display = 'none';
+  }
+}
+
+document.getElementById('key-input').addEventListener('keydown', e => { if(e.key==='Enter') checkKey(); });
+// Pre-fill from localStorage if exists
+const saved = localStorage.getItem('xayz_apikey');
+if (saved) document.getElementById('key-input').value = saved;
+</script>
+</body>
+</html>
